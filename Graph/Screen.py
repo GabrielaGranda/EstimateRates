@@ -40,7 +40,8 @@ async def calculate_estimate(event):
         fuel_price = round(float(fuel_data['response']['data'][0]['value']), 2)
 
         # Load Fuelperc CSV
-        # df = pd.read_csv("Graph/Fuelperc.csv", delimiter=",", on_bad_lines='skip')
+        #df = pd.read_csv("Graph/Fuelperc.csv")
+        #print("CSV Columns:", df.columns)
         fuelper = 0.30
 
         estimate = round((miles * 1.8) + (miles * fuelper), 0)
