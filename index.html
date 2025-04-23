@@ -141,8 +141,8 @@
     let originMarker = null;
     let destinationMarker = null;
 
-  async function drawRoute(lat1, lon1, lat2, lon2, city1, city2) {
-  const geoapifyKey = "664e08db960a41e89ece23f94c9edbdd";
+  async function drawRoute(lat1, lon1, lat2, lon2, city1, city2, geoapi) {
+  const geoapifyKey = geoapi;
   const url = `https://api.geoapify.com/v1/routing?mode=drive&apiKey=${geoapifyKey}&waypoints=${lat1},${lon1}|${lat2},${lon2}`;
   
   console.log("Calling route with URL:", url);

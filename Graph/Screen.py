@@ -58,9 +58,10 @@ async def calculate_estimate(event):
         document.getElementById("currency").innerText = currency
         document.getElementById("miles").innerText = miles
         document.getElementById("ppm").innerText = ppm
+       
 
         # Draw route on map
-        drawRoute(lat_load, lon_load, lat_del, lon_del, loading_city, delivery_city)
+        drawRoute(lat_load, lon_load, lat_del, lon_del, loading_city, delivery_city, geoapify_key)
 
     except Exception as e:
         print(f"❌ Error: {e}")
