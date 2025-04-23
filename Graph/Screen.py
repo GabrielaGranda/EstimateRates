@@ -1,4 +1,4 @@
-from js import document
+from js import document, drawRoute
 from pyodide.ffi import create_proxy
 from pyodide.http import pyfetch
 import pandas as pd
@@ -44,21 +44,28 @@ async def calculate_estimate(event):
         #print("CSV Columns:", df.columns)
         fuelper = 0.30
 
+        # Estimate calculation
+
         estimate = round((miles * 1.8) + (miles * fuelper), 0)
         if (origin == "USA" and destination == "CA") or (origin == "CA" and destination == "USA"):
             estimate += 400
 
         currency = "USD" if origin == "USA" else "CAD"
 
+        ppm = estimate/miles
+
         document.getElementById("rate").innerText = str(estimate)
         document.getElementById("currency").innerText = currency
-        
+        document.getElementById("miles").innerText = miles
+        document.getElementById("ppm").innerText = ppm
+
+        # Draw route on map
+        drawRoute(lat_load, lon_load, lat_del, lon_del, loading_city, delivery_city)
+
     except Exception as e:
         print(f"❌ Error: {e}")
+
 
 # Bind the button
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
-
-
-
