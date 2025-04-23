@@ -7,6 +7,10 @@
 
   <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
   <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+  
+   <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <py-config>
     packages = ["pandas", "matplotlib"]
@@ -20,8 +24,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
+      height: 600px;
+      margin: 100px;
     }
 
     .card {
@@ -77,6 +81,14 @@
     .output span {
       font-weight: bold;
     }
+
+    #map {
+      height: 600px;
+      margin: 20px auto;
+      width: 600px;
+      border: 2px solid #ccc;
+    }
+
   </style>
 </head>
 <body>
@@ -84,13 +96,13 @@
   <div class="card">
     <h2>Estimate Rate Calculator</h2>
 
-    <label for="origin">Origin Docs Country</label>
+    <label for="origin">Origin Country</label>
     <select id="origin">
       <option value="USA">USA</option>
       <option value="CA">CA</option>
     </select>
 
-    <label for="destination">Destination Docs Country</label>
+    <label for="destination">Destination Country</label>
     <select id="destination">
       <option value="USA">USA</option>
       <option value="CA">CA</option>
@@ -106,12 +118,87 @@
     <button id="calculate">Calculate Estimate</button>
 
     <div class="output">
-      <p>Estimated Rate: <span id="rate">—</span></p>
-      <p>Currency: <span id="currency">—</span></p>
+      <p>Estimated Rate: <span id="rate">—</span> <span id="currency">—</span></p>
+      <p>Miles: <span id="miles">—</span></p>
+      <p>$ Per Mile: <span id="ppm">—</span></p>
     </div>
   </div>
+
+  <div id="map"></div>
+
+  <!-- Leaflet JS + Routing -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
+
+  <!-- JavaScript function exposed for PyScript -->
+  <script>
+    let map = L.map('map').setView([39, -98], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+  
+    let routeLine = null;
+    let originMarker = null;
+    let destinationMarker = null;
+
+  async function drawRoute(lat1, lon1, lat2, lon2, city1, city2) {
+  const geoapifyKey = "664e08db960a41e89ece23f94c9edbdd";
+  const url = `https://api.geoapify.com/v1/routing?mode=drive&apiKey=${geoapifyKey}&waypoints=${lat1},${lon1}|${lat2},${lon2}`;
+  
+  console.log("Calling route with URL:", url);
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    console.log("Geoapify response:", data);
+
+    if (!data.features || data.features.length === 0) {
+      console.error("❌ No route returned");
+      return;
+    }
+
+    const rawCoords = data.features[0].geometry.coordinates;
+    const coords = rawCoords.flat().map(c => [c[1], c[0]]);
+    console.log("Route Coordinates:", coords);
+
+    // Remove existing route
+    if (routeLine) {
+      map.removeLayer(routeLine);
+    }
+
+    // Remove old markers
+    if (originMarker) {
+      map.removeLayer(originMarker);
+    }
+    if (destinationMarker) {
+      map.removeLayer(destinationMarker);
+    }
+
+    // Add new route
+    routeLine = L.polyline(coords, { color: 'green', weight: 5 }).addTo(map);
+
+    // Add markers at start and end
+    originMarker = L.marker([lat1, lon1]).addTo(map).bindPopup(`📍 ${city1} (Origin)`).openPopup();
+    destinationMarker = L.marker([lat2, lon2]).addTo(map).bindPopup(`🏁 ${city2} (Destination)`);
+
+    map.fitBounds(routeLine.getBounds());
+    console.log("Route drawn and markers added");
+
+  } catch (error) {
+    console.error("❌ Routing error:", error);
+  }
+}
+
+  window.drawRoute = drawRoute;
+  </script>
+
 
   <py-script src="Graph/Screen.py"></py-script>
 
 </body>
+
+<footer style="position: fixed; bottom: 0; width: 100%; text-align: center; padding: 10px; background: #222; color: #fff;">
+  © 2025 Gabriela Granda. All rights reserved.
+</footer>
+
 </html>
