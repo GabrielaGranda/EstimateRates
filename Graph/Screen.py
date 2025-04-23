@@ -52,7 +52,7 @@ async def calculate_estimate(event):
 
         currency = "USD" if origin == "USA" else "CAD"
 
-        ppm = estimate/miles
+        ppm = round(estimate/miles,2)
 
         document.getElementById("rate").innerText = str(estimate)
         document.getElementById("currency").innerText = currency
