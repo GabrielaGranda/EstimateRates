@@ -69,3 +69,6 @@ async def calculate_estimate(event):
 # Bind the button
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
+
+
+
