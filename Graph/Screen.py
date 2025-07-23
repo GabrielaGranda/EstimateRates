@@ -18,7 +18,7 @@ async def calculate_estimate(event):
         }
 
         response = await pyfetch(
-            url="https://estimateratesapi.onrender.com/estimate",
+            url="https://estimateratesapi.onrender.com/api/estimate",
             method="POST",
             headers={"Content-Type": "application/json"},
             body=json.dumps(data)
