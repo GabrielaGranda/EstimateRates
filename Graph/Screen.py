@@ -1,7 +1,7 @@
 from js import document
 from pyodide.http import pyfetch
-import json
 from pyodide.ffi import create_proxy
+import json
 
 async def calculate_estimate(event):
     try:
@@ -26,19 +26,14 @@ async def calculate_estimate(event):
 
         result = await response.json()
 
-        # Ahora muestras los resultados en el DOM
-        document.getElementById("rate").innerText = str(result["estimate"])
-        document.getElementById("currency").innerText = result["currency"]
-        document.getElementById("miles").innerText = str(result["miles"])
-        document.getElementById("ppm").innerText = str(result["ppm"])
+        document.getElementById("rate").innerText = str(result.get("estimate", "N/A"))
+        document.getElementById("currency").innerText = result.get("currency", "N/A")
+        document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
+        document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
     except Exception as e:
-        print(f"Error al obtener la estimación: {e}")
+        print(f"Error al calcular la estimación: {e}")
 
-
-
-
-# Bind the button
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
 
