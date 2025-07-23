@@ -42,7 +42,7 @@ async def calculate_estimate(event):
         # Load Fuelperc CSV
         #df = pd.read_csv("Graph/Fuelperc.csv")
         #print("CSV Columns:", df.columns)
-        fuelper = 0.33
+        fuelper = 0.34
 
         # Estimate calculation
 
