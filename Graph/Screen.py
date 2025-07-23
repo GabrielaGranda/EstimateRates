@@ -1,35 +1,40 @@
+from js import document
 from pyodide.http import pyfetch
 import json
-from js import document
+from pyodide.ffi import create_proxy
 
 async def calculate_estimate(event):
     try:
-        const data = {
-            "loading_city": document.getElementById("loading").value,
-            "delivery_city": document.getElementById("delivery").value,
-            "origin": document.getElementById("origin").value,
-            "destination": document.getElementById("destination").value
-        };
+        loading_city = document.getElementById("loading").value
+        delivery_city = document.getElementById("delivery").value
+        origin = document.getElementById("origin").value
+        destination = document.getElementById("destination").value
 
-        const response = await pyfetch({
-            url: "https://estimateratesapi.onrender.com/estimate",
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(data)
-        });
+        data = {
+            "loading_city": loading_city,
+            "delivery_city": delivery_city,
+            "origin": origin,
+            "destination": destination
+        }
 
-        const result = await response.json();
+        response = await pyfetch(
+            url="https://estimateratesapi.onrender.com/estimate",
+            method="POST",
+            headers={"Content-Type": "application/json"},
+            body=json.dumps(data)
+        )
 
-        document.getElementById("rate").innerText = result["estimate"];
-        document.getElementById("currency").innerText = result["currency"];
-        document.getElementById("miles").innerText = result["miles"];
-        document.getElementById("ppm").innerText = result["ppm"];
+        result = await response.json()
 
-        // Si la API devuelve ruta, puedes usar drawRoute aquí
-        // drawRoute(result["route"]["lat_load"], result["route"]["lon_load"], ...)
+        # Ahora muestras los resultados en el DOM
+        document.getElementById("rate").innerText = str(result["estimate"])
+        document.getElementById("currency").innerText = result["currency"]
+        document.getElementById("miles").innerText = str(result["miles"])
+        document.getElementById("ppm").innerText = str(result["ppm"])
 
     except Exception as e:
-        console.error("Error fetching estimate:", e);
+        print(f"Error al obtener la estimación: {e}")
+
 
 
 
