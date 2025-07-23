@@ -29,4 +29,10 @@ async def calculate_estimate(event):
         document.getElementById("rate").innerText = str(result.get("estimate", "N/A"))
         document.getElementById("currency").innerText = result.get("currency", "N/A")
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
-        document.getElementById("ppm").innerText = st
+        document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
+
+    except Exception as e:
+        print(f"Error al calcular la estimación: {e}")
+
+calculate_button = document.getElementById("calculate")
+calculate_button.addEventListener("click", create_proxy(calculate_estimate))
