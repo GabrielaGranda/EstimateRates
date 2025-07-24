@@ -3,21 +3,21 @@ from pyodide.http import pyfetch
 from pyodide.ffi import create_proxy
 import json
 
-# Constantes
+# Endpoint PROXY público (no el protegido directamente)
 API_URL = "https://estimateratesapi.onrender.com/proxy/estimate"
-API_KEY = "clavePublica123"  # Esta es la clave pública segura de uso frontend
+API_KEY = "clavePublica123"  # Esta debe coincidir con PROXY_KEY en el backend
 
 async def calculate_estimate(event):
     try:
-        event.preventDefault()  # Evita que el formulario recargue la página (si aplica)
+        event.preventDefault()  # Evita recarga del formulario
 
-        # Obtener valores del formulario
+        # Obtener datos del formulario
         loading_city = document.getElementById("loading").value
         delivery_city = document.getElementById("delivery").value
         origin = document.getElementById("origin").value
         destination = document.getElementById("destination").value
 
-        # Construir payload
+        # Construir el JSON
         data = {
             "loading_city": loading_city,
             "delivery_city": delivery_city,
@@ -25,19 +25,20 @@ async def calculate_estimate(event):
             "destination": destination
         }
 
-        # Llamar al endpoint seguro
+        # Llamada al endpoint proxy
         response = await pyfetch(
             url=API_URL,
             method="POST",
             headers={
                 "Content-Type": "application/json",
-                "X-API-Key": API_KEY
+                "X-API-Key": API_KEY  # Esta es la pública: clavePublica123
             },
             body=json.dumps(data)
         )
+
         result = await response.json()
 
-        # Mostrar resultados
+        # Mostrar resultados en pantalla
         document.getElementById("rate").innerText = str(result.get("estimate", "N/A"))
         document.getElementById("currency").innerText = result.get("currency", "N/A")
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
@@ -47,7 +48,6 @@ async def calculate_estimate(event):
         document.getElementById("rate").innerText = "Error"
         print(f"Error al calcular la estimación: {e}")
 
-# Conectar el botón con la función
+# Conectar botón con función
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
-
