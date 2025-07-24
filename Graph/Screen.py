@@ -5,7 +5,7 @@ import json
 
 # Constantes
 API_URL = "https://estimateratesapi.onrender.com/api/estimate"
-API_KEY = "clavePublica123"  # Esta es la clave pública segura de uso frontend
+API_KEY_Front = "clavePublica123"  # Esta es la clave pública segura de uso frontend
 
 async def calculate_estimate(event):
     try:
@@ -31,7 +31,7 @@ async def calculate_estimate(event):
             method="POST",
             headers={
                 "Content-Type": "application/json",
-                "X-API-Key": API_KEY
+                "X-API-Key": API_KEY_Front
             },
             body=json.dumps(data)
         )
