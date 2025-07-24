@@ -4,7 +4,7 @@ from pyodide.ffi import create_proxy
 import json
 
 # Constantes
-API_URL = "https://estimateratesapi.onrender.com/api/estimate"
+API_URL = "https://estimateratesapi.onrender.com/proxy/estimate"
 API_KEY = "clavePublica123"  # Esta es la clave pública segura de uso frontend
 
 async def calculate_estimate(event):
