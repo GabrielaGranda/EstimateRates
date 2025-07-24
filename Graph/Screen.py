@@ -18,15 +18,14 @@ async def calculate_estimate(event):
         }
 
         response = await pyfetch(
-            url="https://estimateratesapi.onrender.com/api/estimate",
+            url="https://estimateratesapi.onrender.com/proxy/estimate",
             method="POST",
-             headers={
-                    "Content-Type": "application/json",
-                    "x-api-key": "10952a5227efb9a19e4c44fe82050a6d"
-                     },
-            body=json.dumps(data)
-        )
-
+            headers={
+                "Content-Type": "application/json",
+                "X-API-Key": "clavePublica123"  # Esta es la pública, no la backend
+    },
+    body=json.dumps(data)
+)
         result = await response.json()
 
         document.getElementById("rate").innerText = str(result.get("estimate", "N/A"))
