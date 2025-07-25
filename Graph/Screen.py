@@ -54,7 +54,7 @@ async def calculate_estimate(event):
                 lon2 = route.get("lon_del")
                 city1 = route.get("loading_city")
                 city2 = route.get("delivery_city")
-                geoapi_key = route.get("geoapi_key")
+                geoapi_key = result.get("geoapi_key")
             
                 # Llamar a la función JS
                 window.drawRoute(lat1, lon1, lat2, lon2, city1, city2, geoapi_key)
