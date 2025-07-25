@@ -14,15 +14,11 @@ async def calculate_estimate(event):
         # Obtener datos del formulario
         loading_city = document.getElementById("loading").value
         delivery_city = document.getElementById("delivery").value
-        origin = document.getElementById("origin").value
-        destination = document.getElementById("destination").value
 
         # Construir el JSON
         data = {
             "loading_city": loading_city,
             "delivery_city": delivery_city,
-            "origin": origin,
-            "destination": destination
         }
 
         # Llamada al endpoint proxy
