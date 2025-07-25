@@ -3,7 +3,7 @@ from pyodide.http import pyfetch
 from pyodide.ffi import create_proxy
 import json
 
-# Endpoint PROXY público (no el protegido directamente)
+# Endpoint PROXY público
 API_URL = "https://estimateratesapi.onrender.com/proxy/estimate"
 API_KEY = "clavePublica123"  # Esta debe coincidir con PROXY_KEY en el backend
 
@@ -31,7 +31,7 @@ async def calculate_estimate(event):
             method="POST",
             headers={
                 "Content-Type": "application/json",
-                "X-API-Key": API_KEY  # Esta es la pública: clavePublica123
+                "X-API-Key": API_KEY
             },
             body=json.dumps(data)
         )
@@ -44,9 +44,19 @@ async def calculate_estimate(event):
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
+        # Dibujar ruta en el mapa si los datos existen
+        if "route" in result and result["route"]:
+            r = result["route"]
+            drawRoute(
+                r["lat_load"], r["lon_load"],
+                r["lat_del"], r["lon_del"],
+                r["loading_city"], r["delivery_city"],
+                result["geoapi_key"]
+            )
+
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
-        print(f"Error al calcular la estimación: {e}")
+        console.log(f"❌ Error al calcular la estimación: {e}")
 
 # Conectar botón con función
 calculate_button = document.getElementById("calculate")
