@@ -1,4 +1,4 @@
-from js import document
+from js import document, console, drawRoute
 from pyodide.http import pyfetch
 from pyodide.ffi import create_proxy
 import json
