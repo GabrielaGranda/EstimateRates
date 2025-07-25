@@ -35,8 +35,9 @@ async def calculate_estimate(event):
             },
             body=json.dumps(data)
         )
-
-        result = await response.json()
+        if response.status == 200:
+            result = await response.json()
+            console.log("✅ Resultado recibido:", result)
 
         # Mostrar resultados en pantalla
         document.getElementById("rate").innerText = str(result.get("estimate", "N/A"))
@@ -44,6 +45,26 @@ async def calculate_estimate(event):
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
+        # Dibujar ruta si existe en la respuesta
+        route = result.get("route")
+        if route:
+                lat1 = route.get("lat_load")
+                lon1 = route.get("lon_load")
+                lat2 = route.get("lat_del")
+                lon2 = route.get("lon_del")
+                city1 = route.get("loading_city")
+                city2 = route.get("delivery_city")
+                geoapi_key = route.get("geoapi_key")
+            
+                # Llamar a la función JS
+                window.drawRoute(lat1, lon1, lat2, lon2, city1, city2, geoapi_key)
+        else:
+            console.log(f"❌ Error en la respuesta: {response.status}")
+            document.getElementById("rate").innerText = "Error"
+            document.getElementById("currency").innerText = ""
+            document.getElementById("miles").innerText = "—"
+            document.getElementById("ppm").innerText = "—"
+            
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
         print(f"Error al calcular la estimación: {e}")
