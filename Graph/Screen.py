@@ -39,7 +39,7 @@ async def calculate_estimate(event):
         if "route" in result and result["route"]:
             r = result["route"]
             if "geometry" in r and r["geometry"]:
-                drawRoute(r["geometry"])  # <-- Convertir a string JSON
+                drawRoute(pyjson.dumps(r["geometry"]))  # <-- Convertir a string JSON
             else:
                 drawRoute(
                     r["lat_load"], r["lon_load"],
