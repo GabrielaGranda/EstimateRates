@@ -52,7 +52,7 @@ async def calculate_estimate(event):
 
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
-        console.log(f"❌ Error al calcular la estimación: {e}")
+        print(f"❌ Error al calcular la estimación: {e}")
 
 # Vincular evento click al botón calcular
 calculate_button = document.getElementById("calculate")
