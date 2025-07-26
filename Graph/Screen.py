@@ -1,15 +1,10 @@
-from js import document, console, window
+from js import document, console, drawRoute
 from pyodide.http import pyfetch
 from pyodide.ffi import create_proxy
 import json
 
 API_URL = "https://estimateratesapi.onrender.com/proxy/estimate"
 API_KEY = "clavePublica123"  # Debe coincidir con PROXY_KEY en backend
-
-# Función para dibujar la ruta en el mapa (usa la función JS que definimos en el HTML)
-def drawRoute(geometry):
-    # Llama a la función JS window.drawRoute con el objeto geometry
-    window.drawRoute(geometry)
 
 async def calculate_estimate(event):
     try:
@@ -40,12 +35,12 @@ async def calculate_estimate(event):
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
-        # Dibujar ruta usando la geometría recibida del backend
+        # Dibujar ruta: PASAMOS geometry COMO JSON STRING
         if "route" in result and result["route"]:
             r = result["route"]
             if "geometry" in r and r["geometry"]:
-                console.log("Geometry recibida para ruta:", r["geometry"])
-                drawRoute(r["geometry"])
+                geometry_json = json.dumps(r["geometry"])  # <-- Convertir a string JSON
+                drawRoute(geometry_json)  # Pasar string JSON a JS
             else:
                 drawRoute(
                     r["lat_load"], r["lon_load"],
@@ -53,12 +48,11 @@ async def calculate_estimate(event):
                     r["loading_city"], r["delivery_city"],
                 )
         else:
-            print("❌ No route data to draw.")
+            console.log("❌ No route data to draw.")
 
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
-        print(f"❌ Error al calcular la estimación: {e}")
+        console.log(f"❌ Error al calcular la estimación: {e}")
 
-# Vincular evento click al botón calcular
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
