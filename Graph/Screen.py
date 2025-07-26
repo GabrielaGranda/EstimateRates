@@ -38,11 +38,14 @@ async def calculate_estimate(event):
         # Dibujar ruta solo con inicio y fin (sin puntos intermedios)
         if "route" in result and result["route"]:
             r = result["route"]
-            drawRoute(
-                r["lat_load"], r["lon_load"],
-                r["lat_del"], r["lon_del"],
-                r["loading_city"], r["delivery_city"],
-            )
+            if "geometry" in r:
+                drawRoute(r["geometry"])  # 👈 Pasa el GeoJSON directamente
+            else:
+                 drawRoute(
+                    r["lat_load"], r["lon_load"],
+                    r["lat_del"], r["lon_del"],
+                    r["loading_city"], r["delivery_city"],
+                )
         else:
             print("❌ No route data to draw.")
 
