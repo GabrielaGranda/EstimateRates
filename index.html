@@ -124,19 +124,29 @@
   let originMarker = null;
   let destinationMarker = null;
 
-  async function drawRoute(geometryJson) {
-    let geometry;
-    try {
-      geometry = JSON.parse(geometryJson);
-    } catch (e) {
-      console.error("❌ Error parsing geometry JSON:", e);
-      return;
-    }
-  
+  async function drawRoute(geometry) {
     if (!geometry || !geometry.coordinates) {
       console.error("❌ Geometry o coordinates no están definidos", geometry);
       return;
     }
+  
+    // GeoJSON geometry.coordinates es un array de [lon, lat]
+    const coords = geometry.coordinates.map(coord => [coord[1], coord[0]]);
+  
+    // Elimina ruta previa y marcadores si existen
+    if (routeLine) map.removeLayer(routeLine);
+    if (originMarker) map.removeLayer(originMarker);
+    if (destinationMarker) map.removeLayer(destinationMarker);
+  
+    // Dibuja la ruta en el mapa
+    routeLine = L.polyline(coords, { color: 'green', weight: 5 }).addTo(map);
+  
+    // Marca el inicio y fin con marcadores
+    originMarker = L.marker(coords[0]).addTo(map).bindPopup("📍 Origen").openPopup();
+    destinationMarker = L.marker(coords[coords.length - 1]).addTo(map).bindPopup("🏁 Destino");
+  
+    map.fitBounds(routeLine.getBounds());
+  }
 
     // GeoJSON geometry.coordinates es un array de [lon, lat]
     const coords = geometry.coordinates.map(coord => [coord[1], coord[0]]);
