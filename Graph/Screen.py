@@ -30,16 +30,17 @@ async def calculate_estimate(event):
 
         result = await response.json()
 
+        # Mostrar estimación en la interfaz
         document.getElementById("rate").innerText = str(result.get("estimate", "N/A"))
         document.getElementById("currency").innerText = result.get("currency", "N/A")
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
-        # Dibujar ruta: PASAMOS geometry COMO JSON STRING
+        # Dibujar ruta si viene incluida
         if "route" in result and result["route"]:
             r = result["route"]
             if "geometry" in r and r["geometry"]:
-                drawRoute(pyjson.dumps(r["geometry"]))  # <-- Convertir a string JSON
+                drawRoute(r["geometry"])  # ✅ Pasamos objeto directamente, NO string
             else:
                 drawRoute(
                     r["lat_load"], r["lon_load"],
@@ -53,5 +54,6 @@ async def calculate_estimate(event):
         document.getElementById("rate").innerText = "Error"
         console.log(f"❌ Error al calcular la estimación: {e}")
 
+# Asignar evento al botón
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
