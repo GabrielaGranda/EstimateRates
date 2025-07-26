@@ -1,10 +1,15 @@
-from js import document, console, drawRoute
+from js import document, console, window
 from pyodide.http import pyfetch
 from pyodide.ffi import create_proxy
 import json
 
 API_URL = "https://estimateratesapi.onrender.com/proxy/estimate"
 API_KEY = "clavePublica123"  # Debe coincidir con PROXY_KEY en backend
+
+# Función para dibujar la ruta en el mapa (usa la función JS que definimos en el HTML)
+def drawRoute(geometry):
+    # Llama a la función JS window.drawRoute con el objeto geometry
+    window.drawRoute(geometry)
 
 async def calculate_estimate(event):
     try:
@@ -35,23 +40,20 @@ async def calculate_estimate(event):
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
-        # Dibujar ruta solo con inicio y fin (sin puntos intermedios)
+        # Dibujar ruta usando la geometría recibida del backend
         if "route" in result and result["route"]:
             r = result["route"]
             if "geometry" in r:
-                drawRoute(r["geometry"])  # 👈 Pasa el GeoJSON directamente
+                drawRoute(r["geometry"])
             else:
-                 drawRoute(
-                    r["lat_load"], r["lon_load"],
-                    r["lat_del"], r["lon_del"],
-                    r["loading_city"], r["delivery_city"],
-                )
+                console.log("❌ No geometry found in route data")
         else:
-            print("❌ No route data to draw.")
+            console.log("❌ No route data to draw.")
 
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
         console.log(f"❌ Error al calcular la estimación: {e}")
 
+# Vincular evento click al botón calcular
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
