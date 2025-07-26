@@ -47,7 +47,6 @@ async def calculate_estimate(event):
                 r["lat_load"], r["lon_load"],
                 r["lat_del"], r["lon_del"],
                 r["loading_city"], r["delivery_city"],
-                result["geoapi_key"]
             )
 
     except Exception as e:
