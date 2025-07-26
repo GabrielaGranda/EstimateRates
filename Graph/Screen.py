@@ -44,7 +44,7 @@ async def calculate_estimate(event):
                 r["loading_city"], r["delivery_city"],
             )
         else:
-            console.log("❌ No route data to draw.")
+            print("❌ No route data to draw.")
 
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
