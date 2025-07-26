@@ -8,13 +8,12 @@
   <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
   <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
   
-   <!-- Leaflet CSS -->
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <py-config>
-    packages = ["pandas", "matplotlib"]
-    files = ["Graph/Fuelperc.csv"]
+    packages = ["pandas"]
   </py-config>
 
   <style>
@@ -22,10 +21,9 @@
       font-family: 'Segoe UI', sans-serif;
       background: #f4f6f9;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 600px;
-      margin: 100px;
+      margin: 30px;
     }
 
     .card {
@@ -48,7 +46,7 @@
       display: block;
     }
 
-    select, input {
+    input {
       width: 100%;
       padding: 0.5rem;
       margin-top: 0.3rem;
@@ -84,11 +82,12 @@
 
     #map {
       height: 600px;
-      margin: 20px auto;
-      width: 600px;
+      margin-top: 40px;
+      width: 90%;
+      max-width: 900px;
       border: 2px solid #ccc;
+      border-radius: 12px;
     }
-
   </style>
 </head>
 <body>
@@ -114,79 +113,98 @@
 
   <div id="map"></div>
 
-  <!-- Leaflet JS + Routing -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
-
-  <!-- JavaScript function exposed for PyScript -->
+  <!-- Leaflet Map Setup and drawRouteFromGeoJSON -->
   <script>
     let map = L.map('map').setView([39, -98], 4);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-  
+
     let routeLine = null;
-    let originMarker = null;
-    let destinationMarker = null;
 
-  async function drawRoute(lat1, lon1, lat2, lon2, city1, city2, geoapi) {
-  const geoapifyKey = geoapi;
-  const url = `https://api.geoapify.com/v1/routing?mode=drive&apiKey=${geoapifyKey}&waypoints=${lat1},${lon1}|${lat2},${lon2}`;
-  
-  console.log("Calling route with URL:", url);
+    function drawRouteFromGeoJSON(geometry) {
+      if (!geometry || !geometry.coordinates) {
+        console.error("❌ Invalid geometry:", geometry);
+        return;
+      }
 
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    console.log("Geoapify response:", data);
+      const coords = geometry.coordinates[0].map(([lon, lat]) => [lat, lon]);
 
-    if (!data.features || data.features.length === 0) {
-      console.error("❌ No route returned");
-      return;
+      if (routeLine) {
+        map.removeLayer(routeLine);
+      }
+
+      routeLine = L.polyline(coords, {
+        color: 'green',
+        weight: 5
+      }).addTo(map);
+
+      map.fitBounds(routeLine.getBounds());
+      console.log("✅ Route drawn on map.");
     }
 
-    const rawCoords = data.features[0].geometry.coordinates;
-    const coords = rawCoords.flat().map(c => [c[1], c[0]]);
-    console.log("Route Coordinates:", coords);
-
-    // Remove existing route
-    if (routeLine) {
-      map.removeLayer(routeLine);
-    }
-
-    // Remove old markers
-    if (originMarker) {
-      map.removeLayer(originMarker);
-    }
-    if (destinationMarker) {
-      map.removeLayer(destinationMarker);
-    }
-
-    // Add new route
-    routeLine = L.polyline(coords, { color: 'green', weight: 5 }).addTo(map);
-
-    // Add markers at start and end
-    originMarker = L.marker([lat1, lon1]).addTo(map).bindPopup(`📍 ${city1} (Origin)`).openPopup();
-    destinationMarker = L.marker([lat2, lon2]).addTo(map).bindPopup(`🏁 ${city2} (Destination)`);
-
-    map.fitBounds(routeLine.getBounds());
-    console.log("Route drawn and markers added");
-
-  } catch (error) {
-    console.error("❌ Routing error:", error);
-  }
-}
-
-  window.drawRoute = drawRoute;
+    window.drawRouteFromGeoJSON = drawRouteFromGeoJSON;
   </script>
 
+  <!-- PyScript Frontend -->
+  <py-script>
+    from js import document, console, drawRouteFromGeoJSON
+    from pyodide.http import pyfetch
+    from pyodide.ffi import create_proxy
+    import json
 
-  <py-script src="Graph/Screen.py"></py-script>
+    API_URL = "https://estimateratesapi.onrender.com/proxy/estimate"
+    API_KEY = "clavePublica123"
+
+    async def calculate_estimate(event):
+        try:
+            event.preventDefault()
+
+            loading_city = document.getElementById("loading").value
+            delivery_city = document.getElementById("delivery").value
+
+            data = {
+                "loading_city": loading_city,
+                "delivery_city": delivery_city,
+            }
+
+            response = await pyfetch(
+                url=API_URL,
+                method="POST",
+                headers={
+                    "Content-Type": "application/json",
+                    "X-API-Key": API_KEY
+                },
+                body=json.dumps(data)
+            )
+
+            result = await response.json()
+
+            document.getElementById("rate").innerText = str(result.get("estimate", "N/A"))
+            document.getElementById("currency").innerText = result.get("currency", "N/A")
+            document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
+            document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
+
+            if "route" in result and result["route"]:
+                route_data = result["route"]
+                if "geometry" in route_data:
+                    drawRouteFromGeoJSON(route_data["geometry"])
+                else:
+                    console.log("❌ No geometry in route.")
+            else:
+                console.log("❌ Route data missing.")
+
+        except Exception as e:
+            document.getElementById("rate").innerText = "Error"
+            console.log(f"❌ Error calculating estimate: {e}")
+
+    calculate_button = document.getElementById("calculate")
+    calculate_button.addEventListener("click", create_proxy(calculate_estimate))
+  </py-script>
+
+  <footer style="margin-top: 40px; text-align: center; color: #666;">
+    © 2025 Gabriela Granda. All rights reserved.
+  </footer>
 
 </body>
-
-<footer style="position: fixed; bottom: 0; width: 100%; text-align: center; padding: 10px; background: #222; color: #fff;">
-  © 2025 Gabriela Granda. All rights reserved.
-</footer>
-
 </html>
