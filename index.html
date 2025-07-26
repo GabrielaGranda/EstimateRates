@@ -2,28 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Estimate Rates</title>
 
+  <!-- PyScript -->
   <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
   <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
-  
+
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-  <py-config>
-    packages = ["pandas"]
-  </py-config>
-
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+  
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #f4f6f9;
+      margin: 100px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin: 30px;
     }
 
     .card {
@@ -81,12 +80,11 @@
     }
 
     #map {
-      height: 600px;
-      margin-top: 40px;
-      width: 90%;
-      max-width: 900px;
+      height: 500px;
+      width: 600px;
+      margin-top: 30px;
       border: 2px solid #ccc;
-      border-radius: 12px;
+      border-radius: 0.5rem;
     }
   </style>
 </head>
@@ -113,98 +111,42 @@
 
   <div id="map"></div>
 
-  <!-- Leaflet Map Setup and drawRouteFromGeoJSON -->
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
   <script>
+    // Inicializa el mapa Leaflet
     let map = L.map('map').setView([39, -98], 4);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
     let routeLine = null;
+    let originMarker = null;
+    let destinationMarker = null;
 
-    function drawRouteFromGeoJSON(geometry) {
-      if (!geometry || !geometry.coordinates) {
-        console.error("❌ Invalid geometry:", geometry);
-        return;
-      }
+    // Función para dibujar la ruta usando la geometría del backend (GeoJSON)
+    function drawRoute(geometry) {
+      const coords = geometry.coordinates.map(c => [c[1], c[0]]); // invertir lon,lat -> lat,lon
 
-      const coords = geometry.coordinates[0].map(([lon, lat]) => [lat, lon]);
+      if (routeLine) map.removeLayer(routeLine);
+      if (originMarker) map.removeLayer(originMarker);
+      if (destinationMarker) map.removeLayer(destinationMarker);
 
-      if (routeLine) {
-        map.removeLayer(routeLine);
-      }
+      routeLine = L.polyline(coords, { color: 'green', weight: 5 }).addTo(map);
 
-      routeLine = L.polyline(coords, {
-        color: 'green',
-        weight: 5
-      }).addTo(map);
+      originMarker = L.marker(coords[0]).addTo(map).bindPopup('📍 Origin').openPopup();
+      destinationMarker = L.marker(coords[coords.length - 1]).addTo(map).bindPopup('🏁 Destination');
 
       map.fitBounds(routeLine.getBounds());
-      console.log("✅ Route drawn on map.");
     }
 
-    window.drawRouteFromGeoJSON = drawRouteFromGeoJSON;
+    window.drawRoute = drawRoute; // Exponer para PyScript
   </script>
 
-  <!-- PyScript Frontend -->
-  <py-script>
-    from js import document, console, drawRouteFromGeoJSON
-    from pyodide.http import pyfetch
-    from pyodide.ffi import create_proxy
-    import json
-
-    API_URL = "https://estimateratesapi.onrender.com/proxy/estimate"
-    API_KEY = "clavePublica123"
-
-    async def calculate_estimate(event):
-        try:
-            event.preventDefault()
-
-            loading_city = document.getElementById("loading").value
-            delivery_city = document.getElementById("delivery").value
-
-            data = {
-                "loading_city": loading_city,
-                "delivery_city": delivery_city,
-            }
-
-            response = await pyfetch(
-                url=API_URL,
-                method="POST",
-                headers={
-                    "Content-Type": "application/json",
-                    "X-API-Key": API_KEY
-                },
-                body=json.dumps(data)
-            )
-
-            result = await response.json()
-
-            document.getElementById("rate").innerText = str(result.get("estimate", "N/A"))
-            document.getElementById("currency").innerText = result.get("currency", "N/A")
-            document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
-            document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
-
-            if "route" in result and result["route"]:
-                route_data = result["route"]
-                if "geometry" in route_data:
-                    drawRouteFromGeoJSON(route_data["geometry"])
-                else:
-                    console.log("❌ No geometry in route.")
-            else:
-                console.log("❌ Route data missing.")
-
-        except Exception as e:
-            document.getElementById("rate").innerText = "Error"
-            console.log(f"❌ Error calculating estimate: {e}")
-
-    calculate_button = document.getElementById("calculate")
-    calculate_button.addEventListener("click", create_proxy(calculate_estimate))
-  </py-script>
-
-  <footer style="margin-top: 40px; text-align: center; color: #666;">
-    © 2025 Gabriela Granda. All rights reserved.
-  </footer>
+  <!-- PyScript que contiene la lógica Python -->
+  <py-script src="Graph/Screen.py"></py-script>
 
 </body>
 </html>
