@@ -10,10 +10,7 @@
   <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 
   <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   
   <style>
     body {
@@ -115,58 +112,36 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script>
-  let map = L.map('map').setView([39, -98], 4);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
+    let map = L.map('map').setView([39, -98], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-  let routeLine = null;
-  let originMarker = null;
-  let destinationMarker = null;
+    let routeLine = null;
+    let originMarker = null;
+    let destinationMarker = null;
 
-  async function drawRoute(geometry) {
-    if (!geometry || !geometry.coordinates) {
-      console.error("❌ Geometry o coordinates no están definidos", geometry);
-      return;
+    function drawRoute(geometry) {
+      if (!geometry || !geometry.coordinates) {
+        console.error("❌ Geometry o coordinates no están definidos", geometry);
+        return;
+      }
+
+      const coords = geometry.coordinates.map(coord => [coord[1], coord[0]]);
+
+      if (routeLine) map.removeLayer(routeLine);
+      if (originMarker) map.removeLayer(originMarker);
+      if (destinationMarker) map.removeLayer(destinationMarker);
+
+      routeLine = L.polyline(coords, { color: 'green', weight: 5 }).addTo(map);
+
+      originMarker = L.marker(coords[0]).addTo(map).bindPopup("📍 Origen").openPopup();
+      destinationMarker = L.marker(coords[coords.length - 1]).addTo(map).bindPopup("🏁 Destino");
+
+      map.fitBounds(routeLine.getBounds());
     }
-  
-    // GeoJSON geometry.coordinates es un array de [lon, lat]
-    const coords = geometry.coordinates.map(coord => [coord[1], coord[0]]);
-  
-    // Elimina ruta previa y marcadores si existen
-    if (routeLine) map.removeLayer(routeLine);
-    if (originMarker) map.removeLayer(originMarker);
-    if (destinationMarker) map.removeLayer(destinationMarker);
-  
-    // Dibuja la ruta en el mapa
-    routeLine = L.polyline(coords, { color: 'green', weight: 5 }).addTo(map);
-  
-    // Marca el inicio y fin con marcadores
-    originMarker = L.marker(coords[0]).addTo(map).bindPopup("📍 Origen").openPopup();
-    destinationMarker = L.marker(coords[coords.length - 1]).addTo(map).bindPopup("🏁 Destino");
-  
-    map.fitBounds(routeLine.getBounds());
-  }
 
-    // GeoJSON geometry.coordinates es un array de [lon, lat]
-    const coords = geometry.coordinates.map(coord => [coord[1], coord[0]]);
-  
-    // Elimina ruta previa y marcadores si existen
-    if (routeLine) map.removeLayer(routeLine);
-    if (originMarker) map.removeLayer(originMarker);
-    if (destinationMarker) map.removeLayer(destinationMarker);
-
-    // Dibuja la ruta en el mapa
-    routeLine = L.polyline(coords, { color: 'green', weight: 5 }).addTo(map);
-  
-    // Marca el inicio y fin con marcadores
-    originMarker = L.marker(coords[0]).addTo(map).bindPopup("📍 Origen").openPopup();
-    destinationMarker = L.marker(coords[coords.length - 1]).addTo(map).bindPopup("🏁 Destino");
-  
-    map.fitBounds(routeLine.getBounds());
-  }
-
-  window.drawRoute = drawRoute;// Exponer para PyScript
+    window.drawRoute = drawRoute; // ✅ Exponer para PyScript
   </script>
 
   <!-- PyScript que contiene la lógica Python -->
