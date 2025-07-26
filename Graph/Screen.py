@@ -43,12 +43,17 @@ async def calculate_estimate(event):
         # Dibujar ruta usando la geometría recibida del backend
         if "route" in result and result["route"]:
             r = result["route"]
-            if "geometry" in r:
+            if "geometry" in r and r["geometry"]:
+                console.log("Geometry recibida para ruta:", r["geometry"])
                 drawRoute(r["geometry"])
             else:
-                console.log("❌ No geometry found in route data")
+                drawRoute(
+                    r["lat_load"], r["lon_load"],
+                    r["lat_del"], r["lon_del"],
+                    r["loading_city"], r["delivery_city"],
+                )
         else:
-            console.log("❌ No route data to draw.")
+            print("❌ No route data to draw.")
 
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
