@@ -41,13 +41,27 @@ async def calculate_estimate(event):
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
         # Dibujar ruta en el mapa si los datos existen
-        if "route" in result and result["route"]:
+       if "route" in result and result["route"]:
             r = result["route"]
-            drawRoute(
-                r["lat_load"], r["lon_load"],
-                r["lat_del"], r["lon_del"],
-                r["loading_city"], r["delivery_city"],
-            )
+
+            # Verifica si viene la ruta detallada desde Geoapify
+            route_info = r.get("geoapify_route", {})
+            features = route_info.get("features", [])
+
+            if features:
+                coords = features[0]["geometry"]["coordinates"]
+                # Es una lista de [lon, lat] → debes convertirla a [lat, lon] para usarla
+                path = [[lat, lon] for lon, lat in coords]  # Invertimos
+
+                # Llama a la función JS con la ruta detallada
+                drawRoute(path, r["loading_city"], r["delivery_city"])
+            else:
+                # En caso de que no haya ruta completa, usa solo los extremos
+                drawRoute(
+                    [[r["lat_load"], r["lon_load"]],
+                     [r["lat_del"], r["lon_del"]]],
+                    r["loading_city"], r["delivery_city"]
+                )
 
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
