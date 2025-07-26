@@ -3,25 +3,21 @@ from pyodide.http import pyfetch
 from pyodide.ffi import create_proxy
 import json
 
-# Endpoint PROXY público
 API_URL = "https://estimateratesapi.onrender.com/proxy/estimate"
-API_KEY = "clavePublica123"  # Esta debe coincidir con PROXY_KEY en el backend
+API_KEY = "clavePublica123"  # Debe coincidir con PROXY_KEY en backend
 
 async def calculate_estimate(event):
     try:
-        event.preventDefault()  # Evita recarga del formulario
+        event.preventDefault()
 
-        # Obtener datos del formulario
         loading_city = document.getElementById("loading").value
         delivery_city = document.getElementById("delivery").value
 
-        # Construir el JSON
         data = {
             "loading_city": loading_city,
             "delivery_city": delivery_city,
         }
 
-        # Llamada al endpoint proxy
         response = await pyfetch(
             url=API_URL,
             method="POST",
@@ -34,39 +30,25 @@ async def calculate_estimate(event):
 
         result = await response.json()
 
-        # Mostrar resultados en pantalla
         document.getElementById("rate").innerText = str(result.get("estimate", "N/A"))
         document.getElementById("currency").innerText = result.get("currency", "N/A")
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
-        # Dibujar ruta en el mapa si los datos existen
-       if "route" in result and result["route"]:
+        # Dibujar ruta solo con inicio y fin (sin puntos intermedios)
+        if "route" in result and result["route"]:
             r = result["route"]
-
-            # Verifica si viene la ruta detallada desde Geoapify
-            route_info = r.get("geoapify_route", {})
-            features = route_info.get("features", [])
-
-            if features:
-                coords = features[0]["geometry"]["coordinates"]
-                # Es una lista de [lon, lat] → debes convertirla a [lat, lon] para usarla
-                path = [[lat, lon] for lon, lat in coords]  # Invertimos
-
-                # Llama a la función JS con la ruta detallada
-                drawRoute(path, r["loading_city"], r["delivery_city"])
-            else:
-                # En caso de que no haya ruta completa, usa solo los extremos
-                drawRoute(
-                    [[r["lat_load"], r["lon_load"]],
-                     [r["lat_del"], r["lon_del"]]],
-                    r["loading_city"], r["delivery_city"]
-                )
+            drawRoute(
+                r["lat_load"], r["lon_load"],
+                r["lat_del"], r["lon_del"],
+                r["loading_city"], r["delivery_city"],
+            )
+        else:
+            console.log("❌ No route data to draw.")
 
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
-        print(f"❌ Error al calcular la estimación: {e}")
+        console.log(f"❌ Error al calcular la estimación: {e}")
 
-# Conectar botón con función
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
