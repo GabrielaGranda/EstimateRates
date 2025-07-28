@@ -40,7 +40,7 @@ async def calculate_estimate(event):
         if "route" in result and result["route"]:
             r = result["route"]
             if "geometry" in r and r["geometry"]:
-                drawRoute(r["geometry"])  # ✅ Pasamos objeto directamente, NO string
+                drawRoute(r["geometry"].to_js())  # ✅ Pasamos objeto directamente, NO string
             else:
                 drawRoute(
                     r["lat_load"], r["lon_load"],
