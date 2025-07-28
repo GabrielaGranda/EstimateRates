@@ -10,8 +10,11 @@ async def calculate_estimate(event):
     try:
         event.preventDefault()
 
-        # Mostrar estado de carga
-        document.getElementById("status").innerText = "Loading Estinate Rate..."
+        # Mostrar spinner y mensaje
+        status_el = document.getElementById("status")
+        calculate_button = document.getElementById("calculate")
+        status_el.innerHTML = 'Loading Estimate Rate... <span class="spinner"></span>'
+        calculate_button.disabled = True
 
         loading_city = document.getElementById("loading").value
         delivery_city = document.getElementById("delivery").value
@@ -39,12 +42,14 @@ async def calculate_estimate(event):
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
-        # Ocultar mensaje de carga
-        document.getElementById("status").innerText = ""
+        status_el.innerText = ""  # Limpiar mensaje
+        calculate_button.disabled = False  # Reactivar botón
 
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
+        status_el.innerText = "Ocurrió un error"
         console.log(f"❌ Error al calcular la estimación: {e}")
+        calculate_button.disabled = False
 
 # Asignar evento al botón
 calculate_button = document.getElementById("calculate")
