@@ -36,20 +36,6 @@ async def calculate_estimate(event):
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
-        # Dibujar ruta si viene incluida
-        if "route" in result and result["route"]:
-            r = result["route"]
-            if "geometry" in r and r["geometry"]:
-                drawRoute(r["geometry"]  # ✅ Pasamos objeto directamente, NO string
-            else:
-                drawRoute(
-                    r["lat_load"], r["lon_load"],
-                    r["lat_del"], r["lon_del"],
-                    r["loading_city"], r["delivery_city"],
-                )
-        else:
-            console.log("❌ No route data to draw.")
-
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
         console.log(f"❌ Error al calcular la estimación: {e}")
