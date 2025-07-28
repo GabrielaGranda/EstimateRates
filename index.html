@@ -62,7 +62,12 @@
       cursor: pointer;
     }
 
-    button:hover {
+    button:disabled {
+      background: #888;
+      cursor: wait;
+    }
+
+    button:hover:not(:disabled) {
       background: #0056b3;
     }
 
@@ -76,12 +81,28 @@
       font-weight: bold;
     }
 
-    #map {
-      height: 500px;
-      width: 600px;
-      margin-top: 30px;
+    #status {
+      color: #888;
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+
+    /* Spinner style */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
       border: 2px solid #ccc;
-      border-radius: 0.5rem;
+      border-top: 2px solid #007bff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -99,7 +120,7 @@
     <button id="calculate">Calculate Estimate</button>
 
     <div class="output">
-      <p id="status" style="color: #888; font-style: italic;"></p>
+      <p id="status"></p>
       <p>Estimated Rate: <span id="rate">—</span> <span id="currency">—</span></p>
       <p>Miles: <span id="miles">—</span></p>
       <p>$ Per Mile: <span id="ppm">—</span></p>
