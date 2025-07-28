@@ -11,7 +11,7 @@ async def calculate_estimate(event):
         event.preventDefault()
 
         # Mostrar estado de carga
-        document.getElementById("status").innerText = "Calculando estimación..."
+        document.getElementById("status").innerText = "Loading Estinate Rate..."
 
         loading_city = document.getElementById("loading").value
         delivery_city = document.getElementById("delivery").value
