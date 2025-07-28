@@ -106,42 +106,6 @@
     </div>
   </div>
 
-  <div id="map"></div>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-  <script>
-  let map = L.map('map').setView([39.5, -98.35], 4); // Vista general de USA/Canadá
-
-  // Capa base (puedes cambiarla por otra si quieres)
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  let routeLayer = null;
-
-  function drawRoute(geometry) {
-    if (!geometry || !geometry.coordinates) {
-      console.error("❌ Geometry o coordinates no están definidos", geometry);
-      return;
-    }
-
-    // Elimina la ruta anterior si existe
-    if (routeLayer) {
-      map.removeLayer(routeLayer);
-    }
-
-    // Geoapify da [lon, lat], Leaflet quiere [lat, lon]
-    const latlngs = geometry.coordinates.map(([lon, lat]) => [lat, lon]);
-
-    routeLayer = L.polyline(latlngs, { color: 'blue', weight: 5 }).addTo(map);
-
-    // Ajusta la vista al nuevo trayecto
-    map.fitBounds(routeLayer.getBounds());
-  }
-</script>
-
   <!-- PyScript que contiene la lógica Python -->
   <py-script src="Graph/Screen.py"></py-script>
 
