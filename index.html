@@ -112,37 +112,35 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script>
-    let map = L.map('map').setView([39, -98], 4);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+  let map = L.map('map').setView([39.5, -98.35], 4); // Vista general de USA/Canadá
 
-    let routeLine = null;
-    let originMarker = null;
-    let destinationMarker = null;
+  // Capa base (puedes cambiarla por otra si quieres)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
 
-    function drawRoute(geometry) {
-      if (!geometry || !geometry.coordinates) {
-        console.error("❌ Geometry o coordinates no están definidos", geometry);
-        return;
-      }
+  let routeLayer = null;
 
-      const coords = geometry.coordinates.map(coord => [coord[1], coord[0]]);
-
-      if (routeLine) map.removeLayer(routeLine);
-      if (originMarker) map.removeLayer(originMarker);
-      if (destinationMarker) map.removeLayer(destinationMarker);
-
-      routeLine = L.polyline(coords, { color: 'green', weight: 5 }).addTo(map);
-
-      originMarker = L.marker(coords[0]).addTo(map).bindPopup("📍 Origen").openPopup();
-      destinationMarker = L.marker(coords[coords.length - 1]).addTo(map).bindPopup("🏁 Destino");
-
-      map.fitBounds(routeLine.getBounds());
+  function drawRoute(geometry) {
+    if (!geometry || !geometry.coordinates) {
+      console.error("❌ Geometry o coordinates no están definidos", geometry);
+      return;
     }
 
-    window.drawRoute = drawRoute; // ✅ Exponer para PyScript
-  </script>
+    // Elimina la ruta anterior si existe
+    if (routeLayer) {
+      map.removeLayer(routeLayer);
+    }
+
+    // Geoapify da [lon, lat], Leaflet quiere [lat, lon]
+    const latlngs = geometry.coordinates.map(([lon, lat]) => [lat, lon]);
+
+    routeLayer = L.polyline(latlngs, { color: 'blue', weight: 5 }).addTo(map);
+
+    // Ajusta la vista al nuevo trayecto
+    map.fitBounds(routeLayer.getBounds());
+  }
+</script>
 
   <!-- PyScript que contiene la lógica Python -->
   <py-script src="Graph/Screen.py"></py-script>
