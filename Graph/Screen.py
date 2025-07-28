@@ -10,6 +10,9 @@ async def calculate_estimate(event):
     try:
         event.preventDefault()
 
+        # Mostrar estado de carga
+        document.getElementById("status").innerText = "Calculando estimación..."
+
         loading_city = document.getElementById("loading").value
         delivery_city = document.getElementById("delivery").value
 
@@ -35,6 +38,9 @@ async def calculate_estimate(event):
         document.getElementById("currency").innerText = result.get("currency", "N/A")
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
+
+        # Ocultar mensaje de carga
+        document.getElementById("status").innerText = ""
 
     except Exception as e:
         document.getElementById("rate").innerText = "Error"
