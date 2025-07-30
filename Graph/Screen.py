@@ -35,6 +35,7 @@ async def calculate_estimate(event):
         )
 
         result = await response.json()
+        console.log("🔍 Respuesta del backend:", result)
 
         # Mostrar estimación en la interfaz
         document.getElementById("rate").innerText = str(result.get("estimate", "N/A"))
@@ -53,9 +54,8 @@ async def calculate_estimate(event):
         if not all([lat_load, lon_load, lat_del, lon_del]):
             console.log("❌ Coordenadas no válidas o incompletas:", route)
             status_el.innerText = "No se pudo obtener la ruta."
-        return
-    
-        console.log("🔍 Respuesta del backend:", result)
+            calculate_button.disabled = False
+            return  # ✅ ahora sí dentro del if
 
         # Mostrar mapa
         map_div = document.getElementById("map")
