@@ -44,11 +44,18 @@ async def calculate_estimate(event):
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
          # Obtener coordenadas de la ruta
-        route = result.get("route", {})
-        lat_load = route.get("lat_load")
-        lon_load = route.get("lon_load")
-        lat_del = route.get("lat_del")
-        lon_del = route.get("lon_del")
+        route = result.get("route")
+
+        if not route or not all(k in route for k in ["lat_load", "lon_load", "lat_del", "lon_del"]):
+            console.log("❌ Coordenadas faltantes o 'route' es None:", route)
+            status_el.innerText = "No se pudo obtener la ruta."
+            calculate_button.disabled = False
+            return
+        
+        lat_load = route["lat_load"]
+        lon_load = route["lon_load"]
+        lat_del = route["lat_del"]
+        lon_del = route["lon_del"]
 
         if not all([lat_load, lon_load, lat_del, lon_del]):
             console.log("❌ Coordenadas no válidas o incompletas:", route)
