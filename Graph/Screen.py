@@ -49,6 +49,14 @@ async def calculate_estimate(event):
         lat_del = route.get("lat_del")
         lon_del = route.get("lon_del")
 
+        # Validar que no están vacíos
+        if not all([lat_load, lon_load, lat_del, lon_del]):
+            console.log("❌ Coordenadas no válidas o incompletas:", route)
+            status_el.innerText = "No se pudo obtener la ruta."
+        return
+    
+        console.log("🔍 Respuesta del backend:", result)
+
         # Mostrar mapa
         map_div = document.getElementById("map")
         map_div.innerHTML = ""  # Limpiar si ya había un mapa anterior
