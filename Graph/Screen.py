@@ -52,7 +52,7 @@ async def calculate_estimate(event):
         # Mostrar mapa
         map_div = document.getElementById("map")
         map_div.innerHTML = ""  # Limpiar si ya había un mapa anterior
-        map_obj = L.map(map_div).setView([lat_load, lon_load], 6)
+        map_obj = L.map(map_div).setView([39, -98], 4)
 
         L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
             "attribution": "&copy; OpenStreetMap contributors"
