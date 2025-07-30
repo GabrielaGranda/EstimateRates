@@ -104,6 +104,13 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    #map {
+      height: 600px;
+      margin: 20px auto;
+      width: 600px;
+      border: 2px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -128,6 +135,10 @@
       <small>**Disclaimer: These rates are estimates only and do not represent a final quote.</small>
     </div>
   </div>
+  
+  <div id="map"></div>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
   <!-- PyScript que contiene la lógica Python -->
   <py-script src="Graph/Screen.py"></py-script>
