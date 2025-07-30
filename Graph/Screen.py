@@ -35,7 +35,8 @@ async def calculate_estimate(event):
         )
 
         result = await response.json()
-
+        console.log("📦 Respuesta JSON:", result)
+        
         # Mostrar estimación en la interfaz
         document.getElementById("rate").innerText = str(result.get("estimate", "N/A"))
         document.getElementById("currency").innerText = result.get("currency", "N/A")
@@ -49,6 +50,10 @@ async def calculate_estimate(event):
         lat_del = route.get("lat_del")
         lon_del = route.get("lon_del")
 
+        if not all([lat_load, lon_load, lat_del, lon_del]):
+            console.log("❌ Coordenadas no válidas o incompletas:", route)
+            status_el.innerText = "No se pudo obtener la ruta."
+            return
         # Mostrar mapa
         map_div = document.getElementById("map")
         map_div.innerHTML = ""  # Limpiar si ya había un mapa anterior
