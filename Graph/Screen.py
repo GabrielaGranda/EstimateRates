@@ -34,7 +34,7 @@ async def calculate_estimate(event):
             body=json.dumps(data)
         )
 
-        result = await response.json()
+        result = (await response.json()).to_py()
         console.log("🔍 Respuesta del backend:", result)
 
         # Mostrar estimación en la interfaz
