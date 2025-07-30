@@ -1,4 +1,4 @@
-from js import document, console
+from js import document, console, L
 from pyodide.http import pyfetch
 from pyodide.ffi import create_proxy
 import json
@@ -41,6 +41,32 @@ async def calculate_estimate(event):
         document.getElementById("currency").innerText = result.get("currency", "N/A")
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
+
+         # Obtener coordenadas de la ruta
+        route = result.get("route", {})
+        lat_load = route.get("lat_load")
+        lon_load = route.get("lon_load")
+        lat_del = route.get("lat_del")
+        lon_del = route.get("lon_del")
+
+        # Mostrar mapa
+        map_div = document.getElementById("map")
+        map_div.innerHTML = ""  # Limpiar si ya había un mapa anterior
+        map_obj = L.map(map_div).setView([lat_load, lon_load], 6)
+
+        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            "attribution": "&copy; OpenStreetMap contributors"
+        }).addTo(map_obj)
+
+        # Dibujar la línea de ruta
+        L.polyline([[lat_load, lon_load], [lat_del, lon_del]], {
+            "color": "blue",
+            "weight": 4
+        }).addTo(map_obj)
+
+        # Marcadores
+        L.marker([lat_load, lon_load]).addTo(map_obj).bindPopup("Loading City").openPopup()
+        L.marker([lat_del, lon_del]).addTo(map_obj).bindPopup("Delivery City")
 
         status_el.innerText = ""  # Limpiar mensaje
         calculate_button.disabled = False  # Reactivar botón
