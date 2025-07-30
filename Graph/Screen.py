@@ -1,4 +1,4 @@
-from js import document, console
+from js import document, console, L
 from pyodide.http import pyfetch
 from pyodide.ffi import create_proxy
 import json
@@ -50,6 +50,27 @@ async def calculate_estimate(event):
         status_el.innerText = "Ocurrió un error"
         console.log(f"❌ Error al calcular la estimación: {e}")
         calculate_button.disabled = False
+
+async def show_map():
+    response = await pyfetch(API_URL)  # Cambia a tu endpoint real
+    data = await response.json()
+    
+    lat, lon = data["lat"], data["lon"]
+
+    # Crear el mapa desde JS
+    map_div = document.getElementById("map")
+    my_map = L.map(map_div).setView([lat, lon], 13)
+
+    # Cargar tiles de Geoapify o OpenStreetMap
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(my_map)
+
+    # Marcador
+    L.marker([lat, lon]).addTo(my_map).bindPopup("Ubicación del API").openPopup()
+
+# Llamar la función
+await show_map()
 
 # Asignar evento al botón
 calculate_button = document.getElementById("calculate")
