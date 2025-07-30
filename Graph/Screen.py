@@ -67,7 +67,7 @@ async def calculate_estimate(event):
         # Marcadores
         L.marker([lat_load, lon_load]).addTo(map_obj).bindPopup("Loading City").openPopup()
         L.marker([lat_del, lon_del]).addTo(map_obj).bindPopup("Delivery City")
-        
+
         status_el.innerText = ""  # Limpiar mensaje
         calculate_button.disabled = False  # Reactivar botón
 
