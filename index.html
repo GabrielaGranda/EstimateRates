@@ -104,6 +104,12 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    #my-map {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -128,7 +134,18 @@
       <small>**Disclaimer: These rates are estimates only and do not represent a final quote.</small>
     </div>
   </div>
+  
+  <div id="my-map"></div>
 
+  <script>
+    // The Leaflet map Object
+    var map = L.map('my-map').setView([39, -98], 4);
+    L.marker([lat1, lon1]).addTo(map);
+    L.marker([lat2, lon2]).addTo(map);
+    L.polyline([[lat1, lon1], [lat2, lon2]]).addTo(map);
+    
+  </script>
+  
   <!-- PyScript que contiene la lógica Python -->
   <py-script src="Graph/Screen.py"></py-script>
 
