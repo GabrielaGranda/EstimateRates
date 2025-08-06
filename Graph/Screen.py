@@ -1,4 +1,4 @@
-from js import document, console, drawRoute
+from js import document, console
 from pyodide.http import pyfetch
 from pyodide.ffi import create_proxy
 import json
@@ -42,15 +42,6 @@ async def calculate_estimate(event):
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
 
-        if "route" in result and result["route"]:
-            r = result["route"]
-            drawRoute(
-                r["lat_load"], r["lon_load"],
-                r["lat_del"], r["lon_del"],
-                r["coordinates"],  # Nuevo
-                r["loading_city"], r["delivery_city"]
-            )
-        
         status_el.innerText = ""  # Limpiar mensaje
         calculate_button.disabled = False  # Reactivar botón
 
@@ -63,6 +54,4 @@ async def calculate_estimate(event):
 # Asignar evento al botón
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
-
-
 
