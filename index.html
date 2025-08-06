@@ -140,9 +140,21 @@
   <script>
     // The Leaflet map Object
     var map = L.map('my-map').setView([39, -98], 4);
-    L.marker([lat1, lon1]).addTo(map);
-    L.marker([lat2, lon2]).addTo(map);
-    L.polyline([[lat1, lon1], [lat2, lon2]]).addTo(map);
+    function drawRoute(lat1, lon1, lat2, lon2, coordinates, city1, city2) {
+      // Limpiar rutas anteriores si existen
+      if (window.routeLine) {
+          map.removeLayer(window.routeLine);
+      }
+  
+      const routeLatLngs = coordinates.map(coord => [coord[1], coord[0]]); // lon, lat → lat, lon
+      window.routeLine = L.polyline(routeLatLngs, { color: 'blue' }).addTo(map);
+  
+      map.fitBounds(window.routeLine.getBounds());
+  
+      // Opcional: marcadores
+      L.marker([lat1, lon1]).addTo(map).bindPopup(city1).openPopup();
+      L.marker([lat2, lon2]).addTo(map).bindPopup(city2);
+  }
     
   </script>
   
