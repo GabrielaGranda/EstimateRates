@@ -8,6 +8,9 @@
   <!-- PyScript -->
   <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
   <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+  <!-- Leaflet JS + Routing -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -136,7 +139,7 @@
   </div>
   
   <div id="my-map"></div>
-
+   
   <script>
     // The Leaflet map Object
     var map = L.map('my-map').setView([39, -98], 4);
