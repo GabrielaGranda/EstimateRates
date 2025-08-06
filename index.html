@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
   <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 
+  <!-- Leaflet JS + Routing -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
+
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   
@@ -129,6 +133,20 @@
     </div>
   </div>
 
+  <div id="map"></div>
+
+  <script>
+  var map = L.map('map').setView([39, -98], 4);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    L.marker([51.5, -0.09]).addTo(map)
+        .bindPopup('A pretty CSS popup.<br> Easily customizable.')
+        .openPopup();
+  </script>
+  
   <!-- PyScript que contiene la lógica Python -->
   <py-script src="Graph/Screen.py"></py-script>
 
