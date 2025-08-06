@@ -41,11 +41,15 @@ async def calculate_estimate(event):
         document.getElementById("currency").innerText = result.get("currency", "N/A")
         document.getElementById("miles").innerText = str(result.get("miles", "N/A"))
         document.getElementById("ppm").innerText = str(result.get("ppm", "N/A"))
-        # Extraer coordenadas
-        lat1 = result["route"]["lat_load"]
-        lon1 = result["route"]["lon_load"]
-        lat2 = result["route"]["lat_del"]
-        lon2 = result["route"]["lon_del"]
+
+        if "route" in result and result["route"]:
+            r = result["route"]
+            drawRoute(
+                r["lat_load"], r["lon_load"],
+                r["lat_del"], r["lon_del"],
+                r["coordinates"],  # Nuevo
+                r["loading_city"], r["delivery_city"]
+            )
         
         status_el.innerText = ""  # Limpiar mensaje
         calculate_button.disabled = False  # Reactivar botón
@@ -59,4 +63,5 @@ async def calculate_estimate(event):
 # Asignar evento al botón
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
+
 
