@@ -172,6 +172,15 @@ async function drawRoute(lat_load, lon_load, lat_del, lon_del, loading_city, del
         .bindPopup(`📍 ${loading_city} (Origin)`)
         .openPopup();
 
+    const redIcon = L.icon({
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x-red.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        shadowSize: [41, 41]
+    });
+  
     destinationMarker = L.marker([lat_del, lon_del])
         .addTo(map)
         .bindPopup(`🏁 ${delivery_city} (Destination)`);
