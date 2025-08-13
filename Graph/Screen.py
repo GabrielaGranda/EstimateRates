@@ -49,7 +49,7 @@ async def calculate_estimate(event):
                 r["lat_load"], r["lon_load"],
                 r["lat_del"], r["lon_del"],
                 r["loading_city"], r["delivery_city"],
-                result["geoapi_key"]
+                result["GEOAPIFY_KEY"]
             )
         
         status_el.innerText = ""  # Limpiar mensaje
@@ -64,6 +64,7 @@ async def calculate_estimate(event):
 # Asignar evento al botón
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
+
 
 
 
