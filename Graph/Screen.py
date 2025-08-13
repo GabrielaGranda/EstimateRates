@@ -1,4 +1,4 @@
-from js import document, console
+from js import document, console, drawRoute
 from pyodide.http import pyfetch
 from pyodide.ffi import create_proxy
 import json
@@ -64,5 +64,6 @@ async def calculate_estimate(event):
 # Asignar evento al botón
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
+
 
 
