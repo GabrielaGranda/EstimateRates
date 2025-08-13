@@ -27,12 +27,9 @@
     }
 
     .card {
-      background: white;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      max-width: 500px;
-      width: 100%;
+      width: 420px;           /* fijo */
+      max-width: 420px;
+      flex: 0 0 420px;        /* no crecer, no encoger */
     }
 
     h2 {
@@ -106,8 +103,8 @@
 
     #map {
       height: 600px;
-      margin: 20px auto;
-      width: 600px;
+      flex: 1 1 600px;        /* puede crecer/encoger, base 600px */
+      min-width: 300px;
       border: 2px solid #ccc;
     }
 
@@ -138,10 +135,12 @@
       <P><small>**The estimated rates above do not include exportation or inspection fees.</small></P>
       <small>**Disclaimer: These rates are estimates only and do not represent a final quote.</small>
     </div>
+
+    <div id="map"></div>
     
   </div>
 
-  <div id="map"></div>
+  
 
   <script>
     var map = L.map('map').setView([39, -98], 4);
