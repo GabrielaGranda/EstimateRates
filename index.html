@@ -151,58 +151,38 @@
       }).addTo(map);
 
     let routeLine = null;
-    let originMarker = null;
-    let destinationMarker = null;
+let originMarker = null;
+let destinationMarker = null;
 
-  async function drawRoute(lat_load, lon_load, lat_del, lon_del, city_load, city_del, GEOAPIFY_KEY) {
-  const geoapifyKey = GEOAPIFY_KEY;
-  const url = `https://api.geoapify.com/v1/routing?mode=drive&apiKey=${geoapifyKey}&waypoints=${lat1},${lon1}|${lat2},${lon2}`;
-  
-  console.log("Calling route with URL:", url);
+async function drawRoute(lat_load, lon_load, lat_del, lon_del, loading_city, delivery_city) {
+    // Limpiar ruta anterior
+    if (routeLine) map.removeLayer(routeLine);
+    if (originMarker) map.removeLayer(originMarker);
+    if (destinationMarker) map.removeLayer(destinationMarker);
 
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    console.log("Geoapify response:", data);
+    // Dibujar línea entre origen y destino
+    routeLine = L.polyline([[lat_load, lon_load], [lat_del, lon_del]], {
+        color: 'green',
+        weight: 5
+    }).addTo(map);
 
-    if (!data.features || data.features.length === 0) {
-      console.error("❌ No route returned");
-      return;
-    }
+    // Marcadores
+    originMarker = L.marker([lat_load, lon_load])
+        .addTo(map)
+        .bindPopup(`📍 ${loading_city} (Origin)`)
+        .openPopup();
 
-    const rawCoords = data.features[0].geometry.coordinates;
-    const coords = rawCoords.flat().map(c => [c[1], c[0]]);
-    console.log("Route Coordinates:", coords);
+    destinationMarker = L.marker([lat_del, lon_del])
+        .addTo(map)
+        .bindPopup(`🏁 ${delivery_city} (Destination)`);
 
-    // Remove existing route
-    if (routeLine) {
-      map.removeLayer(routeLine);
-    }
-
-    // Remove old markers
-    if (originMarker) {
-      map.removeLayer(originMarker);
-    }
-    if (destinationMarker) {
-      map.removeLayer(destinationMarker);
-    }
-
-    // Add new route
-    routeLine = L.polyline(coords, { color: 'green', weight: 5 }).addTo(map);
-
-    // Add markers at start and end
-    originMarker = L.marker([lat1, lon1]).addTo(map).bindPopup(`📍 ${city1} (Origin)`).openPopup();
-    destinationMarker = L.marker([lat2, lon2]).addTo(map).bindPopup(`🏁 ${city2} (Destination)`);
-
+    // Ajustar vista al bounds
     map.fitBounds(routeLine.getBounds());
-    console.log("Route drawn and markers added");
-
-  } catch (error) {
-    console.error("❌ Routing error:", error);
-  }
+    console.log("Ruta dibujada correctamente entre", loading_city, "y", delivery_city);
 }
 
-  window.drawRoute = drawRoute;
+// Exponer la función globalmente para PyScript
+window.drawRoute = drawRoute;
  
   </script>
   
