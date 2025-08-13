@@ -149,6 +149,61 @@
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
+
+    let routeLine = null;
+    let originMarker = null;
+    let destinationMarker = null;
+
+  async function drawRoute(lat1, lon1, lat2, lon2, geoapi) {
+  const geoapifyKey = geoapi;
+  const url = `https://api.geoapify.com/v1/routing?mode=drive&apiKey=${geoapifyKey}&waypoints=${lat1},${lon1}|${lat2},${lon2}`;
+  
+  console.log("Calling route with URL:", url);
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    console.log("Geoapify response:", data);
+
+    if (!data.features || data.features.length === 0) {
+      console.error("❌ No route returned");
+      return;
+    }
+
+    const rawCoords = data.features[0].geometry.coordinates;
+    const coords = rawCoords.flat().map(c => [c[1], c[0]]);
+    console.log("Route Coordinates:", coords);
+
+    // Remove existing route
+    if (routeLine) {
+      map.removeLayer(routeLine);
+    }
+
+    // Remove old markers
+    if (originMarker) {
+      map.removeLayer(originMarker);
+    }
+    if (destinationMarker) {
+      map.removeLayer(destinationMarker);
+    }
+
+    // Add new route
+    routeLine = L.polyline(coords, { color: 'green', weight: 5 }).addTo(map);
+
+    // Add markers at start and end
+    originMarker = L.marker([lat1, lon1]).addTo(map).bindPopup(`📍 ${city1} (Origin)`).openPopup();
+    destinationMarker = L.marker([lat2, lon2]).addTo(map).bindPopup(`🏁 ${city2} (Destination)`);
+
+    map.fitBounds(routeLine.getBounds());
+    console.log("Route drawn and markers added");
+
+  } catch (error) {
+    console.error("❌ Routing error:", error);
+  }
+}
+
+  window.drawRoute = drawRoute;
+ 
   </script>
   
   <!-- PyScript que contiene la lógica Python -->
