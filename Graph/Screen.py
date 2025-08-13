@@ -34,6 +34,10 @@ async def calculate_estimate(event):
             body=json.dumps(data)
         )
 
+        if not response.ok:
+            error_text = await response.text()
+            raise Exception(f"HTTP {response.status}: {error_text}")
+
         result = await response.json()
 
         # Mostrar estimación en la interfaz
@@ -48,8 +52,7 @@ async def calculate_estimate(event):
             drawRoute(
                 r["lat_load"], r["lon_load"],
                 r["lat_del"], r["lon_del"],
-                r["loading_city"], r["delivery_city"],
-                result["GEOAPIFY_KEY"]
+                r["loading_city"], r["delivery_city"]
             )
         
         status_el.innerText = ""  # Limpiar mensaje
@@ -64,7 +67,4 @@ async def calculate_estimate(event):
 # Asignar evento al botón
 calculate_button = document.getElementById("calculate")
 calculate_button.addEventListener("click", create_proxy(calculate_estimate))
-
-
-
 
