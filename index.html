@@ -175,7 +175,7 @@ async function drawRoute(lat_load, lon_load, lat_del, lon_del, loading_city, del
     destinationMarker = L.marker([lat_del, lon_del])
         .addTo(map)
         .bindPopup(`🏁 ${delivery_city} (Destination)`);
-        .openPopup();
+        
 
     // Ajustar vista al bounds
     map.fitBounds(routeLine.getBounds());
